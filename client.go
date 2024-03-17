@@ -28,6 +28,9 @@ func newSingleClient(opt *ClientOption, prev conn, connFn connFn) (*singleClient
 	conn := connFn(opt.InitAddress[0], opt)
 	conn.Override(prev)
 	if err := conn.Dial(); err != nil {
+		if opt.ForceSingleClient {
+			return newSingleClientWithConn(conn, cmds.NewBuilder(cmds.NoSlot), !opt.DisableRetry), err
+		}
 		return nil, err
 	}
 	return newSingleClientWithConn(conn, cmds.NewBuilder(cmds.NoSlot), !opt.DisableRetry), nil

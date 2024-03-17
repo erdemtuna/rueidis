@@ -165,6 +165,9 @@ type ClientOption struct {
 	//  ForceSingleClient force the usage of a single client connection, without letting the lib guessing
 	//  if redis instance is a cluster or a single redis instance.
 	ForceSingleClient bool
+	//  ForceClusterClient force the usage of cluster connection, without letting the lib guessing
+	//  if redis instance is a cluster or a single redis instance.
+	ForceClusterClient bool
 
 	// ReplicaOnly indicates that this client will only try to connect to readonly replicas of redis setup.
 	ReplicaOnly bool
@@ -342,6 +345,9 @@ func NewClient(option ClientOption) (client Client, err error) {
 	if option.Sentinel.MasterSet != "" {
 		option.PipelineMultiplex = singleClientMultiplex(option.PipelineMultiplex)
 		return newSentinelClient(&option, makeConn)
+	}
+	if option.ForceClusterClient {
+		return newClusterClient(&option, makeConn)
 	}
 	if option.ForceSingleClient {
 		option.PipelineMultiplex = singleClientMultiplex(option.PipelineMultiplex)

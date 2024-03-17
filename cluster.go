@@ -121,6 +121,9 @@ func newClusterClient(opt *ClientOption, connFn connFn) (client *clusterClient, 
 	}
 
 	if err = client.init(); err != nil {
+		if opt.ForceClusterClient {
+			return client, client.refresh(context.Background())
+		}
 		return nil, err
 	}
 
